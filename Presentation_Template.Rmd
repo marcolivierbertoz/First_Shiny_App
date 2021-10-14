@@ -1,0 +1,112 @@
+---
+title: "Mass Shooting Analysis"
+output: powerpoint_presentation
+params:
+  df: NA
+  state: NA
+  
+  
+
+---
+
+```{r setup, echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Loading the libraries
+library(tidyverse)
+library(lubridate)
+ 
+```
+
+```{r, echo=FALSE}
+new_df <- params$df
+```
+
+
+## Index
+
+- Scope
+- Data Source
+- Evolution Death and Injured for `r params$state`
+- Top 10 cities with highest  # events for state of `r params$state`
+- Top 10 cities with highest # Killed for state of `r params$state`
+- Top 10 cities with highest # Injured for state of `r params$state`
+
+
+
+## Scope 
+
+The presentation aim to show the various mass shooting events that occur in the United States of America
+
+## Data Source
+
+https://www.gunviolencearchive.org/
+
+## Evolution Death and Injured for `r params$state`
+
+```{r, echo=FALSE, fig.width=10}
+new_df %>% 
+  count(Year=year(`Incident Date`)) %>% 
+  ggplot(mapping = aes(Year,n))+
+  geom_col(fill="White",color="black")+
+  geom_text(aes(label=n), position=position_dodge(width=0.9), vjust=-0.25)+
+  labs(x="Years",
+       y="Number of events")
+  
+
+```
+
+## Top 10 cities with highest  # events for state of `r params$state`
+```{r, echo=FALSE, fig.width=10}
+# Top ten cities
+
+new_df %>% 
+  group_by(`City Or County`) %>% 
+  count() %>% 
+  arrange(desc(n)) %>% 
+  head(10) %>% 
+  ggplot(mapping=aes(x= reorder(`City Or County`, -n), y=n))+
+  geom_col(fill="White",color="black")+
+  geom_text(aes(label=n), position=position_dodge(width=0.9), vjust=-0.25)+
+  labs(x="Cities",
+       y="Number of event")
+
+```
+
+## Top 10 cities with highest # Killed for state of `r params$state`
+```{r, echo=FALSE, fig.width=10}
+# Top ten cities with highest deaths
+
+new_df %>% 
+  group_by(`City Or County`) %>% 
+  summarise(
+    Total_Killed=sum(`# Killed`)
+  ) %>% 
+  arrange(desc(Total_Killed)) %>% 
+  head(10) %>% 
+  ggplot(mapping=aes(x= reorder(`City Or County`,-Total_Killed), y=Total_Killed))+
+  geom_col(fill="White",color="black")+
+  geom_text(aes(label=Total_Killed), position=position_dodge(width=0.9), vjust=-0.25)+
+  labs(x="Cities",
+       y="Number of Deaths")
+```
+
+
+## Top 10 cities with highest # Injured for state of `r params$state`
+```{r, echo=FALSE, fig.width=10}
+# Top ten cities with highest injured
+
+new_df %>% 
+  group_by(`City Or County`) %>% 
+  summarise(
+    Total_Injured=sum(`# Injured`)
+  ) %>% 
+  arrange(desc(Total_Injured)) %>% 
+  head(10) %>% 
+  ggplot(mapping=aes(x= reorder(`City Or County`,-Total_Injured), y=Total_Injured))+
+  geom_col(fill="White",color="black")+
+  geom_text(aes(label=Total_Injured), position=position_dodge(width=0.9), vjust=-0.25)+
+  labs(title = "Top 10 cities with highest number of people Injured",
+       x="Cities",
+       y="Number of Injured")
+```
+
